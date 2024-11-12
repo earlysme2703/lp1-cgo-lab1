@@ -1,4 +1,4 @@
-# lp1-cgo-lab1 **Granite Model Code Generation Lab in Google Colab**
+# **Code Generation Lab exercise using Granite Code Model**
 Code Generation using IBM Granite Code
 
 ## Purpose
@@ -28,13 +28,37 @@ The lab uses the IBM Granite Code model hosted on Replicate to generate Python c
 2. Click on “Add new secret” and name it `REPLICATE_API_TOKEN`.
 3. Paste your Replicate token into the value field.
 
+--- 
+## Code Generation with Granite Code Model
+
+Please follow the step-by-step process documented here below for getting output without any errors:
+
+### Step 1: Create a Colab Jupiter Notebook instance & Initialize the replicate libraries.
+
+Description: This script demonstrates the use of a large language model (LLM) to generate ipywidgets-based UI code for an online bookstore landing page.
+Dependencies:
+- ibm_granite_community.notebook_utils
+- langchain_community.llms
+- Replicate API (requires an API token)
+
+The code below initializes the IBM Granite model on Replicate to generate a simple Jupyter Notebook ipywidgets-based UI for an online bookstore landing page.
+Open the file named learn_cg-lab1.py in Google Colab, follow these steps:
+
+* Open a New Code Cell:
+        In Google Colab, create a new code cell by clicking on "+ Code" or using the keyboard shortcut Ctrl + M + B (Windows) or Cmd + M + B (Mac).
+
+* Use the Colab File System Commands:
+        In the new code cell, use the following code to create a new Python file named **learn_cg-lab1.py** in your Colab environment:
+
+#### Cell 1: Install required packages
+
 ```bash
 # Install required packages
 !pip install git+https://github.com/ibm-granite-community/utils \
             "langchain_community<0.3.0" \ 
             replicate
 ```
-
+#### Cell 2: Initialize the Replicate model
 ```python
 # Initilize the Replicate & Colab Libraries
 
@@ -47,4 +71,95 @@ model = Replicate(
     replicate_api_token=get_env_var('REPLICATE_API_TOKEN'),
     model_kwargs={"max_length": 100, "temperature": 0.2},
 )
+```
+
+### Step 2:Zero-Shot Prompt Method Creation
+
+In this step, we will define a **zeroshot_prompt** function to generate ipywidgets-based UI components for the online bookstore. This function uses the IBM Granite Code model to interpret the prompt and return code tailored to the task and question provided.
+
+
+#### Cell 3: Define and Execute the Zero-Shot Prompt Function
+
+This method formulates a zero-shot prompt where the model acts as an experienced programmer. The prompt is designed to instruct the model to generate Python code for creating an ipywidgets-based UI for an online bookstore. It takes in two inputs—context and question—to create a detailed prompt, ensuring the model understands the UI components required for the bookstore interface.
+
+```python
+def zeroshot_prompt(context, question):
+    """
+    Creates a zero-shot prompt for the model, where the model acts as a seasoned programmer.
+ 
+    Parameters:
+    - context: str, contextual information for the prompt
+    - question: str, specific question or task for the model to perform
+ 
+    Returns:
+    - str, the formatted prompt
+    """
+    prompt = f"""
+You are an experienced programmer with 15 years of experience writing full-stack applications. Your task is to help build an online bookstore by creating UI components using Jupyter Notebook ipywidgets for interactivity. The output code should not exceed 100 tokens, and should avoid using the GridBoxLayout attribute. Write Python code to address each specific user request. Return only the code as output. 
+
+    Task: {context}
+ 
+    Question: {question}
+    """
+    return prompt
+```
+
+#### Cell 4: Invoke the Model
+
+```python
+def get_answer_using_zeroshot(context, question):
+    """
+    Generates the response from the model based on a zero-shot prompt.
+ 
+    Parameters:
+    - context: str, contextual information for the prompt
+    - question: str, specific question for the model to answer
+ 
+    Returns:
+    - str, the generated result from the model
+    """
+    prompt = zeroshot_prompt(context, question)
+    result = model.invoke(prompt)
+ 
+    return result
+```
+
+#### Cell 5: Generate and Display the UI Code
+
+This method invokes the model to generate a response based on the zero-shot prompt. It first calls the zeroshot_prompt method to generate the formatted prompt and then passes this prompt to the model for inference. The model returns code that meets the specified requirements, such as building a UI with ipywidgets for the bookstore’s landing page.
+
+```python
+context = "Design and develop an online bookstore with user-friendly UI components."
+question = "Create the landing page for users visiting my bookstore. The landing page should display a catalog of book titles as tiles and include a free-text search bar with a search icon."
+ 
+# Generate and display the UI code for the landing page
+result = get_answer_using_zeroshot(context, question)
+print(f"Generated Code:\n{result}")
+```
+
+## Generated Code:
+
+Below is an example of the generated code for the online bookstore's landing page UI using ipywidgets. This serves as a reference and provides an outline for what the output may look like:
+
+```python
+from IPython.display import display
+# Create a container for the landing page
+container = widgets.VBox()
+# Create a title for the landing page
+title = widgets.HTML(value="<h1>Welcome to our bookstore!</h1>")
+# Create a catalog of book titles as tiles
+catalog = widgets.GridBox(children=[
+ widgets.HTML(value="<div style='background-color: #f2f2f2; padding: 20px; margin: 10px; border-radius: 5px;'><h2>Book Title 1</h2><p>Author: Author Name 1</p><p>Price: $10.00</p></div>"),
+ widgets.HTML(value="<div style='background-color: #f2f2f2; padding: 20px; margin: 10px; border-radius: 5px;'><h2>Book Title 2</h2><p>Author: Author Name 2</p><p>Price: $15.00</p></div>"),
+ widgets.HTML(value="<div style='background-color: #f2f2f2; padding: 20px; margin: 10px; border-radius: 5px;'><h2>Book Title 3</h2><p>Author: Author Name 3</p><p>Price: $20.00</p></div>")
+], layout=widgets.Layout(grid_template_columns='repeat(3, 1fr)'))
+# Create a free-text search bar with a search icon
+search_bar = widgets.HBox(children=[
+ widgets.Text(value="", placeholder="Search for a book", style={"width": "200px"}),
+ widgets.Button(icon="search", tooltip="Search")
+])
+# Add the title, catalog, and search bar to the container
+container.children = [title, catalog, search_bar]
+# Display the container
+display(container)
 ```
