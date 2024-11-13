@@ -137,7 +137,7 @@ result = get_answer_using_zeroshot(context, question)
 print(f"Generated Code:\n{result}")
 ```
 
-## Generated Code:
+### Step 3:Verify Generated Code.
 
 Below is an example of the generated code for the online bookstore's landing page UI using ipywidgets. This serves as a reference and provides an outline for what the output may look like:
 
